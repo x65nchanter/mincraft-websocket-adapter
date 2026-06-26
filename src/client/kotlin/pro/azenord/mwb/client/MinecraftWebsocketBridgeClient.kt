@@ -81,12 +81,8 @@ class MinecraftWebsocketBridgeClient : ClientModInitializer {
 
                         // 🎯 НАШЕ ГЛАВНОЕ СОБЫТИЕ: Отслеживание движения ИИ
                         override fun onPathEvent(event: PathEvent) {
-                            val currentGoal = primaryBaritone.customGoalProcess.goal
-                            val goalInfo = if (currentGoal != null) {
-                                mapOf("type" to currentGoal.javaClass.simpleName, "info" to currentGoal.toString())
-                            } else {
-                                mapOf("type" to "none")
-                            }
+                            val currentGoal = primaryBaritone?.customGoalProcess?.goal ?: return
+                            val goalInfo = mapOf("type" to currentGoal.javaClass.simpleName, "info" to currentGoal.toString())
                             mapOf("error" to currentGoal.javaClass.simpleName, "info" to "No path found")
                             when (event) {
                                 PathEvent.AT_GOAL -> {
