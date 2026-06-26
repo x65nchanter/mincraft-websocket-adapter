@@ -9,4 +9,7 @@ For setup instructions, please see the [Fabric Documentation page](https://docs.
 This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
 
 Invoke-WebRequest -Uri "https://github.com/cabaletta/baritone/releases/download/v1.11.2/baritone-standalone-fabric-1.11.2.jar" -OutFile ".\libs\baritone-standalone-fabric-1.11.2.jar"
-Invoke-WebRequest -Uri "https://github.com/cabaletta/baritone/releases/download/v1.11.2/nether-pathfinder-1.4.1.jar" -OutFile ".\libs\nether-pathfinder-1.4.1.jar"
+wget -O ./libs/baritone-standalone-fabric-1.11.2.jar https://github.com/cabaletta/baritone/releases/download/v1.11.2/baritone-standalone-fabric-1.11.2.jar
+
+Invoke-WebRequest -Uri "https://github.com/cabaletta/baritone/releases/download/v1.11.2/baritone-api-fabric-1.11.2.jar" -OutFile ".\libs\baritone-api-fabric-1.11.2.jar"
+wget -O ./libs/baritone-api-fabric-1.11.2.jar https://github.com/cabaletta/baritone/releases/download/v1.11.2/baritone-api-fabric-1.11.2.jar

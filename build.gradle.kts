@@ -50,7 +50,8 @@ dependencies {
 
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 	include("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-	modImplementation(files("libs/baritone-standalone-fabric-1.11.2.jar"))
+
+	modImplementation(files("libs/baritone-api-fabric-1.11.2.jar"))
 	modImplementation("dev.babbaj:nether-pathfinder:1.4.1")
 }
 

@@ -21,6 +21,21 @@ import net.minecraft.client.network.ServerInfo
 import org.slf4j.LoggerFactory
 import pro.azenord.mwb.core.CommandParser
 import net.fabricmc.loader.api.FabricLoader
+import baritone.api.BaritoneAPI
+import baritone.api.event.events.BlockChangeEvent
+import baritone.api.event.events.BlockInteractEvent
+import baritone.api.event.events.ChatEvent
+import baritone.api.event.events.ChunkEvent
+import baritone.api.event.events.PacketEvent
+import baritone.api.event.events.PathEvent
+import baritone.api.event.events.PlayerUpdateEvent
+import baritone.api.event.events.RenderEvent
+import baritone.api.event.events.RotationMoveEvent
+import baritone.api.event.events.SprintStateEvent
+import baritone.api.event.events.TabCompleteEvent
+import baritone.api.event.events.TickEvent
+import baritone.api.event.events.WorldEvent
+import baritone.api.event.listener.IGameEventListener
 
 class MinecraftWebsocketBridgeClient : ClientModInitializer {
     private val logger = LoggerFactory.getLogger("minecraft-websocket-bridge")
@@ -55,6 +70,62 @@ class MinecraftWebsocketBridgeClient : ClientModInitializer {
                         "player_name" to (client.player?.gameProfile?.name ?: "unknown")
                     )
                 )
+
+                // ------------------------------------------------------------------
+                // РЕГИСТРАЦИЯ ИИ-СОБЫТИЙ BARITONE
+                // ------------------------------------------------------------------
+                try {
+                    val primaryBaritone = BaritoneAPI.getProvider().getPrimaryBaritone()
+
+                    primaryBaritone.gameEventHandler.registerEventListener(object : IGameEventListener {
+
+                        // 🎯 НАШЕ ГЛАВНОЕ СОБЫТИЕ: Отслеживание движения ИИ
+                        override fun onPathEvent(event: PathEvent) {
+                            val currentGoal = primaryBaritone.customGoalProcess.goal
+                            val goalInfo = if (currentGoal != null) {
+                                mapOf("type" to currentGoal.javaClass.simpleName, "info" to currentGoal.toString())
+                            } else {
+                                mapOf("type" to "none")
+                            }
+                            mapOf("error" to currentGoal.javaClass.simpleName, "info" to "No path found")
+                            when (event) {
+                                PathEvent.AT_GOAL -> {
+                                    broadcastEvent("baritone_status", mapOf("state" to "arrived") + goalInfo)
+                                }
+                                PathEvent.CALC_STARTED -> {
+                                    broadcastEvent("baritone_status", mapOf("state" to "pathing_started") + goalInfo)
+                                }
+                                PathEvent.CALC_FAILED -> {
+                                    broadcastEvent("baritone_status", mapOf("state" to "calculation_failed", "error" to "No path found"))
+                                }
+                                PathEvent.CANCELED -> {
+                                    broadcastEvent("baritone_status", mapOf("state" to "canceled"))
+                                }
+                                else -> { /* Игнорируем промежуточные шаги типа CALC_STARTED */ }
+                            }
+                        }
+
+                        // 📝 ОСТАЛЬНЫЕ МЕТОДЫ ИНТЕРФЕЙСА: Оставляем пустыми, чтобы не спамить код
+                        override fun onTick(event: TickEvent?) {}
+                        override fun onPostTick(event: TickEvent?) {}
+                        override fun onPlayerUpdate(event: PlayerUpdateEvent?) {}
+                        override fun onSendChatMessage(event: ChatEvent?) {}
+                        override fun onPreTabComplete(event: TabCompleteEvent?) {}
+                        override fun onChunkEvent(event: ChunkEvent?) {}
+                        override fun onBlockChange(event: BlockChangeEvent?) {}
+                        override fun onRenderPass(event: RenderEvent?) {}
+                        override fun onWorldEvent(event: WorldEvent?) {}
+                        override fun onSendPacket(event: PacketEvent?) {}
+                        override fun onReceivePacket(event: PacketEvent?) {}
+                        override fun onPlayerRotationMove(event: RotationMoveEvent?) {}
+                        override fun onPlayerSprintState(event: SprintStateEvent?) {}
+                        override fun onBlockInteract(event: BlockInteractEvent?) {}
+                        override fun onPlayerDeath() {}
+                    })
+                    logger.info("[MinecraftWebsocketBridge] Обработчик событий Baritone успешно зарегистрирован.")
+                } catch (e: Exception) {
+                    logger.error("[MinecraftWebsocketBridge] Ошибка подписки на Baritone: ${e.message}")
+                }
             }
         }
 
@@ -156,6 +227,25 @@ class MinecraftWebsocketBridgeClient : ClientModInitializer {
                 }
                 val responseJson = Gson().toJson(mapOf("status" to "success", "mods" to modsList))
                 ctx.channel().writeAndFlush(TextWebSocketFrame(responseJson))
+            }
+
+            else if (message.action == "baritone") {
+                val commandText = message.payload["command"] ?: return
+                client.execute {
+                    if (client.player != null) {
+                        try {
+                            // Вызываем встроенную систему команд Baritone напрямую через его API
+                            val primaryBaritone = BaritoneAPI.getProvider().primaryBaritone
+                            primaryBaritone.commandManager.execute(commandText)
+
+                            ctx.channel().writeAndFlush(TextWebSocketFrame("{\"status\": \"baritone_executing\", \"command\": \"$commandText\"}"))
+                        } catch (e: Exception) {
+                            ctx.channel().writeAndFlush(TextWebSocketFrame("{\"error\": \"Baritone failed to execute command: ${e.message}\"}"))
+                        }
+                    } else {
+                        ctx.channel().writeAndFlush(TextWebSocketFrame("{\"error\": \"Player is not in game\"}"))
+                    }
+                }
             }
         }
 
