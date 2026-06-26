@@ -8,6 +8,5 @@ For setup instructions, please see the [Fabric Documentation page](https://docs.
 
 This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
 
-podman machine ssh
-sudo dnf install -y socat # если её еще нет в виртуалке
-socat TCP-LISTEN:64342,fork TCP:10.0.2.2:64342 &
+Invoke-WebRequest -Uri "https://github.com/cabaletta/baritone/releases/download/v1.11.2/baritone-standalone-fabric-1.11.2.jar" -OutFile ".\libs\baritone-standalone-fabric-1.11.2.jar"
+Invoke-WebRequest -Uri "https://github.com/cabaletta/baritone/releases/download/v1.11.2/nether-pathfinder-1.4.1.jar" -OutFile ".\libs\nether-pathfinder-1.4.1.jar"

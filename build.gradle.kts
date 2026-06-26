@@ -16,6 +16,9 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	maven {
+		url = uri("https://babbaj.github.io/maven/")
+	}
 }
 
 loom {
@@ -47,11 +50,8 @@ dependencies {
 
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 	include("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-//	modImplementation("com.github.cabaletta:baritone:v1.11.2") {
-//		artifact {
-//			classifier = "api-fabric"
-//		}
-//	}
+	modImplementation(files("libs/baritone-standalone-fabric-1.11.2.jar"))
+	modImplementation("dev.babbaj:nether-pathfinder:1.4.1")
 }
 
 tasks.processResources {

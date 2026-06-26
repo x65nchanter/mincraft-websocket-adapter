@@ -1,5 +1,6 @@
 package pro.azenord.mwb.client
 
+import com.google.gson.Gson
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.*
 import io.netty.channel.group.DefaultChannelGroup
@@ -19,6 +20,7 @@ import net.minecraft.client.network.ServerAddress
 import net.minecraft.client.network.ServerInfo
 import org.slf4j.LoggerFactory
 import pro.azenord.mwb.core.CommandParser
+import net.fabricmc.loader.api.FabricLoader
 
 class MinecraftWebsocketBridgeClient : ClientModInitializer {
     private val logger = LoggerFactory.getLogger("minecraft-websocket-bridge")
@@ -141,6 +143,19 @@ class MinecraftWebsocketBridgeClient : ClientModInitializer {
                             .writeAndFlush(TextWebSocketFrame("{\"error\": \"Player is not connected to any server\"}"))
                     }
                 }
+            }
+
+            else if (message.action == "mods") {
+                // Получаем все моды через официальный API Fabric Loader
+                val modsList = FabricLoader.getInstance().allMods.map { mod ->
+                    mapOf(
+                        "id" to mod.metadata.id,
+                        "version" to mod.metadata.version.friendlyString,
+                        "name" to mod.metadata.name
+                    )
+                }
+                val responseJson = Gson().toJson(mapOf("status" to "success", "mods" to modsList))
+                ctx.channel().writeAndFlush(TextWebSocketFrame(responseJson))
             }
         }
 
