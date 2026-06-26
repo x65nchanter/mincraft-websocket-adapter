@@ -13,6 +13,27 @@ pluginManagement {
 	}
 }
 
+dependencyResolutionManagement {
+	repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+	repositories {
+		mavenCentral()
+		maven {
+			name = "Mojang"
+			url = uri("https://libraries.minecraft.net/")
+		}
+
+		maven {
+			name = "FabricPublic"
+			url = uri("https://maven.fabricmc.net")
+		}
+
+		maven {
+			name = "JitPack"
+			url = uri("https://jitpack.io")
+		}
+	}
+}
+
 // Should match your modid
 rootProject.name = "minecraft-websocket-bridge"
 

@@ -39,16 +39,19 @@ dependencies {
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${providers.gradleProperty("fabric_kotlin_version").get()}")
 
-    implementation("io.netty:netty-all:4.1.100.Final")
-    include("io.netty:netty-all:4.1.100.Final")
+    implementation("io.netty:netty-all:4.2.5.Final")
+    include("io.netty:netty-all:4.2.5.Final")
 
 	implementation(project(":core"))
 	include(project(":core"))
 
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 	include("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
-	modImplementation(files("libs/baritone-api-fabric-1.11.2.jar"))
+//	modImplementation("com.github.cabaletta:baritone:v1.11.2") {
+//		artifact {
+//			classifier = "api-fabric"
+//		}
+//	}
 }
 
 tasks.processResources {
