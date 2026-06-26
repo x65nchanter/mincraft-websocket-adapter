@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
 	id("net.fabricmc.fabric-loom-remap")
 	`maven-publish`
-	id("org.jetbrains.kotlin.jvm") version "2.4.0"
+	kotlin("jvm") version "2.4.0"
+	kotlin("plugin.serialization") version "2.4.0" apply false
 }
 
 version = providers.gradleProperty("mod_version").get()
@@ -40,6 +41,14 @@ dependencies {
 
     implementation("io.netty:netty-all:4.1.100.Final")
     include("io.netty:netty-all:4.1.100.Final")
+
+	implementation(project(":core"))
+	include(project(":core"))
+
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+	include("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+	modImplementation(files("libs/baritone-api-fabric-1.11.2.jar"))
 }
 
 tasks.processResources {

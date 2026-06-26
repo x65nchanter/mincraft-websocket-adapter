@@ -15,3 +15,5 @@ pluginManagement {
 
 // Should match your modid
 rootProject.name = "minecraft-websocket-bridge"
+
+include("core")

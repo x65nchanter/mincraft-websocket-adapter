@@ -38,3 +38,6 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+/.kotlin/
+/libs/baritone-api-fabric-1.11.2.jar
+/.ai/
